@@ -4,11 +4,11 @@ const port = 3000
 
 // Routes importing
 const cases = require("./routes/cases");
-// const history = require("./routes/history");
+const history = require("./routes/history");
 
 // Routing
 app.use("/cases",cases);
-// app.use("//history",history);
+app.use("/history",history);
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
