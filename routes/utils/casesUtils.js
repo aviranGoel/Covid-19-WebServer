@@ -1,8 +1,3 @@
-const axios = require("axios");
-
-// The using API
-const api_url = "https://covid-api.mmediagroup.fr/v1";
-
 const commonFunctionality = require("./commonFunctionality/commonFunctionality");
 const apiFunctionality = require("./apiFunctionality/apiFunctionality");
 
@@ -12,23 +7,32 @@ const apiFunctionality = require("./apiFunctionality/apiFunctionality");
  * @param {*} given_date : Date to when get details.
  * @returns 
  */
-async function calculateCases(country, given_date) {
+async function calculateCases(country, given_date) 
+{
     // Case when country consists of two words, the spacebar represented by '20%',
     // we replace it to real spacebar.
     country = country.replace('%20', ' ');
 
-    // Get confirmed data by dates of the given country (dictionary[date : confirmed]).
-    let dates_confirmed_dictionary = await apiFunctionality.getDatesConfirmedCasesOfCountry_usingAPI(country);
+    // Get details of the given country.
+    let details_country = await apiFunctionality.getDatesConfirmedCasesOfCountryAndPopulation_usingAPI(country);
 
-    if (dates_confirmed_dictionary === "Error!")
+    // Check if the given country exists.
+    if (details_country === "Error!") 
     {
-        return "Error!";
+      throw "Sorry we didn't find this country";
     }
 
-    // given_date = "01-09-2021";
+    // Get confirmed data by dates of the given country (dictionary[date : confirmed]).
+    let dates_confirmed_dictionary = details_country[0];
 
     // Get array of two date in format YYYY-MM-DD (given date, previous date).
     let formatted_current_and_previous_dates = await getTwoFormattedDates(given_date);
+
+    // Check if all dates appears in the confirmed data.
+    if ( ! (await commonFunctionality.checkDatesAppearanceInData(dates_confirmed_dictionary, formatted_current_and_previous_dates)))
+    {
+        throw "Sorry we didn't find one of the dates";
+    }
 
     // String of previous date in format DD-MM-YYYY.
     let previous_date_ddmmyyyy = await commonFunctionality.formatDateTo_ddmmyyyy(formatted_current_and_previous_dates[1]);
@@ -48,9 +52,9 @@ async function calculateCases(country, given_date) {
 
     // Create the return answer.
     let answer = `Querying about ` + country + `, ` + given_date + 
-    `\nData:` +
-    `\n   ` + country + ` confirmed case ` + given_date + `: ` + confirmed_current_date + `,` + previous_date_ddmmyyyy + `: ` + confirmed_previos_date +
-    `\nResult: ` + confirmed_subtraction;
+    `<br/>Data:` +
+    `<br/>&emsp;` + country + ` confirmed case ` + given_date + `: ` + confirmed_current_date + `,` + previous_date_ddmmyyyy + `: ` + confirmed_previos_date +
+    `<br/>Result: ` + confirmed_subtraction;
 
     return(answer);
 }

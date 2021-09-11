@@ -24,5 +24,24 @@ async function formatDateTo_ddmmyyyy(date_yyyymmdd)
     return formatted_date_ddmmyyyy;
 }
 
+/**
+ * Check all dates in the dates_array, are appears in the dates_dictionary.
+ * Return False if at least one of them didn't apperas.
+ * Otherwisae Return True.
+ * @param {*} dates_dictionary : Dictionary[date : confirmed].
+ * @param {*} dates_array : Array of dates.
+ * @returns 
+ */
+async function checkDatesAppearanceInData(dates_dictionary, dates_array) {
+  for (i = 0; i < dates_array.length; i++) {
+    if (!(dates_array[i] in dates_dictionary)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 exports.formatDateTo_yyyymmdd = formatDateTo_yyyymmdd;
 exports.formatDateTo_ddmmyyyy = formatDateTo_ddmmyyyy;
+exports.checkDatesAppearanceInData = checkDatesAppearanceInData;
